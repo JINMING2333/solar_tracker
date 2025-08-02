@@ -31,18 +31,30 @@ for raw in resp.text.splitlines():
     pl     = uplink["decoded_payload"]
 
     rows.append({
-        "time"      : pd.to_datetime(msg["received_at"]),
-        "fcnt"      : uplink.get("f_cnt", 0),   # ← 关键改动
-        "curDeg"    : pl.get("curDeg"),
-        "tgtDeg"    : pl.get("tgtDeg"),
-        "altDeg"    : pl.get("altDeg"),
-        "motor_mWh" : pl.get("motor_mWh"),
-        "logic_mWh" : pl.get("logic_mWh"),
-        "solar_mWh" : pl.get("solar_mWh"),
-        "motor_s"   : pl.get("motor_s"),
-        "ldrEast"   : pl.get("ldrEast"),
-        "ldrWest"   : pl.get("ldrWest"),
+        "time"          : pd.to_datetime(msg["received_at"]),
+        "fcnt"          : uplink.get("f_cnt", 0),
+
+        "curAngle_deg"  : pl.get("curAngle_deg"),
+        "tgtAngle_deg"  : pl.get("tgtAngle_deg"),
+
+        "Ea_motor_mWh"  : pl.get("Ea_motor_mWh"),
+        "Ei_motor_mWh"  : pl.get("Ei_motor_mWh"),
+        "E_logic_mWh"   : pl.get("E_logic_mWh"),
+        "E_solar_mWh"   : pl.get("E_solar_mWh"),
+
+        "LDR_E"         : pl.get("LDR_E"),
+        "LDR_W"         : pl.get("LDR_W"),
+
+        "Vm_motor"      : pl.get("Vm_motor"),
+        "Im_motor"      : pl.get("Im_motor"),
+
+        "Vm_logic"      : pl.get("Vm_logic"),
+        "Im_logic"      : pl.get("Im_logic"),
+
+        "Vm_solar"      : pl.get("Vm_solar"),
+        "Im_solar"      : pl.get("Im_solar"),
     })
+
 
 if not rows:
     raise SystemExit("❌  解码后仍为空，确认字段名与设备 ID")
@@ -52,7 +64,7 @@ df = (pd.DataFrame(rows)
         .sort_values("time")
         .reset_index(drop=True))
 
-out = f"{DEV_ID}_last{HOURS}h_0703_04.csv"
+out = f"{DEV_ID}_last{HOURS}h_0730.csv"
 df.to_csv(out, index=False)
 print(f"✔ {len(df)} rows → {out}")
 print(df.head())

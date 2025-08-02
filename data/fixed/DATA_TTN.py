@@ -49,7 +49,7 @@ df = (pd.DataFrame(rows)
         .sort_values("time")
         .reset_index(drop=True))
 
-out = f"{DEV_ID}_last{HOURS}h_0703_04.csv"
+out = f"{DEV_ID}_last{HOURS}h_0730.csv"
 df.to_csv(out, index=False)
 print(f"✔ {len(df)} rows → {out}")
 print(df.head())
