@@ -33,8 +33,10 @@ const float   ROTATE_THRESHOLD = 5.0;
 float computeSunAzimuth() {
   DateTime now = rtc.now();
   SunPosition sun(LAT, LON, now.unixtime(), timeZone);  // 创建并计算
+  Serial.println("-----");
   return sun.azimuth();
 }
+
 
 // 电流传感器
 Adafruit_INA219 motorINA(0x41);
@@ -258,24 +260,24 @@ void loop() {
   //   tgt = -EAST_LIMIT;  // 夜间不动或保持东边等待日出
   // }
 
-  uint32_t sunrise = sunNow.sunrise();
-  uint32_t sunset  = sunNow.sunset();
-  uint32_t nowUnix = nowTime.unixtime();
+  uint32_t sr = sunNow.sunrise();
+  uint32_t ss = sunNow.sunset();
+  uint16_t nowMin = nowTime.hour() * 60 + nowTime.minute();  // 当天分钟
 
-  float tgt;
-  if (sunEl > 5.0) {
-    float ratio = constrain((float)(nowUnix - sunrise) / (sunset - sunrise), 0.0, 1.0);
-    tgt = -90.0 + ratio * 180.0;  // -90° 到 +90°
+  // // 调试日志（强烈建议先开几次看数值是否合理）
+  // Serial.print("sr="); Serial.print(sr);
+  // Serial.print(" ss="); Serial.print(ss);
+  // Serial.print(" now="); Serial.println(nowMin);
+
+  // float tgt;
+  if (sunEl > 5.0 && ss > sr) {
+    float ratio = (float)(nowMin - sr) / (float)(ss - sr);
+    ratio = constrain(ratio, 0.0, 1.0);
+    tgt = -90.0 + ratio * 180.0;  // -90° → +90°
     hasReturnedEast = false;
   } else {
     if (!hasReturnedEast) {
-      Serial.println("🌙 太阳落山，执行回东");
-      bool ok = moveToAngle(-EAST_LIMIT);
-      if (ok) {
-        Serial.println("✅ 夜间归东完成");
-      } else {
-        Serial.println("⚠️ 夜间归东失败");
-      }
+      moveToAngle(-EAST_LIMIT);
       hasReturnedEast = true;
     }
     tgt = -EAST_LIMIT;

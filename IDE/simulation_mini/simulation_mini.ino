@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 
+
 // 电机控制引脚
 const byte IN1 = 3, IN2 = 4, PWM = 5, STBY = 2;
 const uint8_t PWM_DUTY = 150;
@@ -8,7 +9,7 @@ const uint8_t PWM_DUTY = 150;
 // 编码器
 const byte ENC_A = 6, ENC_B = 7;
 volatile long encCount = 0;
-const float PULSE_PER_DEG = 4.5;
+const float PULSE_PER_DEG = 4.7;
 
 const int16_t EAST_LIMIT = 90;      // 最大东向角度（默认可设为 90）
 const int16_t WEST_LIMIT = 90;      // 最大西向角度（默认可设为 90）

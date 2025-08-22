@@ -4,9 +4,9 @@ import requests, pandas as pd, json, datetime as dt
 TENANT   = "eu1"
 APP_ID   = "microsolar"
 DEV_ID   = "single"
-TOKEN    = "NNSXS.O75FV7W623KO4JWSGWX5DTFRDS7IWRI5NKHD7EI.LGGAAGWB3BZ4CWQJRSVR6JORAAWTN6ZEW5Q64EMTYJKHMPNXLFTA"
+TOKEN    = "NNSXS.3ECGGBEKOUIGU4EOB7NXXODLANGEHUXFDN4PK7I.6Q4TITULSLPXKZXEVHAEQB4ZP2WZ3N2MXXLOGD7GMJ5AQNCKERNQ"
 
-HOURS    = 24            # 抓取最近 N 小时
+HOURS    = 48            # 抓取最近 N 小时
 # --------------------------------
 
 url = f"https://{TENANT}.cloud.thethings.network/api/v3/as/applications/{APP_ID}/devices/{DEV_ID}/packages/storage/uplink_message"
@@ -31,28 +31,28 @@ for raw in resp.text.splitlines():
     pl     = uplink["decoded_payload"]
 
     rows.append({
-        "time"          : pd.to_datetime(msg["received_at"]),
-        "fcnt"          : uplink.get("f_cnt", 0),
+        "time": pd.to_datetime(msg["received_at"]),
+        "fcnt": uplink.get("f_cnt", 0),
 
-        "curAngle_deg"  : pl.get("curAngle_deg"),
-        "tgtAngle_deg"  : pl.get("tgtAngle_deg"),
+        "angle_current_deg"     : pl.get("angle_current_deg"),
+        "angle_target_deg"      : pl.get("angle_target_deg"),
+        "ldr_east_raw"          : pl.get("ldr_east_raw"),
+        "ldr_west_raw"          : pl.get("ldr_west_raw"),
+        "wake_time_s"           : pl.get("wake_time_s"),
 
-        "Ea_motor_mWh"  : pl.get("Ea_motor_mWh"),
-        "Ei_motor_mWh"  : pl.get("Ei_motor_mWh"),
-        "E_logic_mWh"   : pl.get("E_logic_mWh"),
-        "E_solar_mWh"   : pl.get("E_solar_mWh"),
+        "energy_logic_mWh"      : pl.get("energy_logic_mWh"),
+        "energy_motor_idle_mWh" : pl.get("energy_motor_idle_mWh"),
+        "energy_motor_run_mWh"  : pl.get("energy_motor_run_mWh"),
+        "energy_solar_mWh"      : pl.get("energy_solar_mWh"),
 
-        "LDR_E"         : pl.get("LDR_E"),
-        "LDR_W"         : pl.get("LDR_W"),
-
-        "Vm_motor"      : pl.get("Vm_motor"),
-        "Im_motor"      : pl.get("Im_motor"),
-
-        "Vm_logic"      : pl.get("Vm_logic"),
-        "Im_logic"      : pl.get("Im_logic"),
-
-        "Vm_solar"      : pl.get("Vm_solar"),
-        "Im_solar"      : pl.get("Im_solar"),
+        "V_logic_V"             : pl.get("V_logic_V"),
+        "I_logic_mA"            : pl.get("I_logic_mA"),
+        "V_motor_idle_V"        : pl.get("V_motor_idle_V"),
+        "I_motor_idle_mA"       : pl.get("I_motor_idle_mA"),
+        "V_motor_run_V"         : pl.get("V_motor_run_V"),
+        "I_motor_run_mA"        : pl.get("I_motor_run_mA"),
+        "V_solar_V"             : pl.get("V_solar_V"),
+        "I_solar_mA"            : pl.get("I_solar_mA"),
     })
 
 
@@ -64,7 +64,7 @@ df = (pd.DataFrame(rows)
         .sort_values("time")
         .reset_index(drop=True))
 
-out = f"{DEV_ID}_last{HOURS}h_0730.csv"
+out = f"{DEV_ID}_last{HOURS}h_0816-17.csv"
 df.to_csv(out, index=False)
 print(f"✔ {len(df)} rows → {out}")
 print(df.head())

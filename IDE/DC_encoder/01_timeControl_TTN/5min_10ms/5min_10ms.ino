@@ -81,13 +81,12 @@ bool moveToAngle(float tgtDeg, uint32_t timeout = 8000) {
   bool fwd = tgtPulse > encCount;
   motorRun(fwd, PWM_DUTY);
   uint32_t t0 = millis();
-  uint32_t tSample = t0;              // ★ 声明并初始化
+  uint32_t tSample = t0;              
   long prev = encCount;
 
   while (fwd ? encCount < tgtPulse : encCount > tgtPulse) {
-    /* ← 新增：每 10 ms 累加一次 motor 能量 */
     uint32_t now = millis();
-    if (now - tSample >= 10) {                           // 10 ms 粗采
+    if (now - tSample >= 10) {                           // 10 ms
       motor_mWs += motorINA.getPower_mW() * (now - tSample);
       tSample = now;
     }

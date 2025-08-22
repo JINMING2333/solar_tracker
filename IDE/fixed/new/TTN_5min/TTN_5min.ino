@@ -12,7 +12,7 @@ Adafruit_INA219 inaSYS(0x41);
 
 /* ------------ LoRa Keys ---------- */
 String appEuiStr = "0000000000000000";
-String appKeyStr = "817A05EB77508E8C2FC8410C040CB706";
+String appKeyStr = "88F69C465D40376DEA90FE92F3764A36";
 
 /* ------------ Timing ------------- */
 const uint16_t SAMPLE_MS       = 1000;          // 1 s

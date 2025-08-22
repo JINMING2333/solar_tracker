@@ -3,10 +3,10 @@ import requests, pandas as pd, json, datetime as dt
 # ---------- 配置 ----------
 TENANT   = "eu1"
 APP_ID   = "microsolar"
-DEV_ID   = "fixed"
+DEV_ID   = "fixed2"
 TOKEN    = "NNSXS.O75FV7W623KO4JWSGWX5DTFRDS7IWRI5NKHD7EI.LGGAAGWB3BZ4CWQJRSVR6JORAAWTN6ZEW5Q64EMTYJKHMPNXLFTA"
 
-HOURS    = 24            # 抓取最近 N 小时
+HOURS    = 48            # 抓取最近 N 小时
 # --------------------------------
 
 url = f"https://{TENANT}.cloud.thethings.network/api/v3/as/applications/{APP_ID}/devices/{DEV_ID}/packages/storage/uplink_message"
@@ -27,18 +27,24 @@ for raw in resp.text.splitlines():
     except json.JSONDecodeError:
         continue
 
-    uplink = msg["uplink_message"]
-    pl     = uplink["decoded_payload"]
+    uplink = msg.get("uplink_message", {})
+    pl     = uplink.get("decoded_payload", {})
 
     rows.append({
-        "time"      : pd.to_datetime(msg["received_at"]),
-        "fcnt"      : uplink.get("f_cnt", 0),   # ← 关键改动
-        "Ipv_mA"    : pl.get("Ipv_mA"),
-        "Isys_mA"    : pl.get("Isys_mA"),
-        "Vpv_V"    : pl.get("Vpv_V"),
-        "Vsys_V"    : pl.get("Vsys_V"),
-        "PV_mWh" : pl.get("PV_mWh"),
-        "SYS_mWh" : pl.get("SYS_mWh"),
+        "time"              : pd.to_datetime(msg["received_at"]),
+        "fcnt"              : uplink.get("f_cnt", 0),
+
+        "LDR_east"          : pl.get("LDR_east"),
+        "LDR_west"          : pl.get("LDR_west"),
+        "wake_duration_s"   : pl.get("wake_duration_s"),
+
+        "solar_energy_mWh"  : pl.get("solar_energy_mWh"),
+        "solar_voltage_V"   : pl.get("solar_voltage_V"),
+        "solar_current_mA"  : pl.get("solar_current_mA"),
+
+        "logic_energy_mWh"  : pl.get("logic_energy_mWh"),
+        "logic_voltage_V"   : pl.get("logic_voltage_V"),
+        "logic_current_mA"  : pl.get("logic_current_mA"),
     })
 
 if not rows:
@@ -49,7 +55,7 @@ df = (pd.DataFrame(rows)
         .sort_values("time")
         .reset_index(drop=True))
 
-out = f"{DEV_ID}_last{HOURS}h_0730.csv"
+out = f"{DEV_ID}_last{HOURS}h_0816-17.csv"
 df.to_csv(out, index=False)
 print(f"✔ {len(df)} rows → {out}")
 print(df.head())
